@@ -1,53 +1,90 @@
+# ========================================
+# 📦 IMPORT LIBRARIES AND MODULES
+# ========================================
+
 import streamlit as st
 import os
 import shutil
+
 from parser import parse_pdf
-from generator_ai import generate_text_section
+from vectorial_db import store_in_chromadb  # ✅ indicizzazione
+from generator_ai import generate_section_from_documents  # ✅ retrieval + generazione
 
-# Configurazione pagina
-st.set_page_config(page_title="Agente ESG", layout="wide")
-st.title("🧠 Agente AI per Report di Sostenibilità")
 
-# -- SEZIONE UPLOAD PDF --
-st.header("📄 Carica documenti PDF")
-UPLOAD_FOLDER = "documenti"
+# ========================================
+# ⚙️ STREAMLIT PAGE CONFIGURATION
+# ========================================
+
+st.set_page_config(page_title="ESG Report AI Agent", layout="wide")
+st.title("🧠 AI Agent for Sustainability Reporting")
+
+
+# ========================================
+# 📁 FILE UPLOAD SECTION
+# ========================================
+
+st.header("📄 Upload your ESG document(s)")
+UPLOAD_FOLDER = "Documents"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-uploaded_files = st.file_uploader("Carica uno o più file PDF", type=["pdf"], accept_multiple_files=True)
+uploaded_files = st.file_uploader(
+    label="Upload one or more PDF files",
+    type=["pdf"],
+    accept_multiple_files=True
+)
 
+# Process each uploaded file
 if uploaded_files:
     for uploaded_file in uploaded_files:
         file_path = os.path.join(UPLOAD_FOLDER, uploaded_file.name)
+
+        # Save the file locally
         with open(file_path, "wb") as f:
             shutil.copyfileobj(uploaded_file, f)
-        
+
+        # Parse the PDF content
         nome, estensione, testo, pagine = parse_pdf(file_path)
-        
-        with st.expander(f"📘 {nome}{estensione} ({len(pagine)} pagine)", expanded=False):
-            st.markdown(f"**Nome file:** `{nome}`")
-            st.markdown("**Anteprima del testo estratto:**")
+
+        # Index the text chunks into ChromaDB ✅
+        store_in_chromadb(nome, estensione, testo)
+
+        # Show preview
+        with st.expander(f"📘 {nome}{estensione} ({len(pagine)} pages)", expanded=False):
+            st.markdown(f"**File name:** `{nome}`")
+            st.markdown("**Text preview:**")
             st.write(testo[:1000] + "..." if len(testo) > 1000 else testo)
-
 else:
-    st.info("Carica almeno un file PDF per iniziare.")
+    st.info("Please upload at least one file to proceed.")
 
-# -- SEZIONE GENERAZIONE TESTO CON OLLAMA --
-st.header("✏️ Genera sezione del report")
 
-with st.form("form_generazione"):
-    prompt = st.text_area("Scrivi qui il prompt per generare una sezione del report", height=200)
-    modello = st.selectbox("Scegli il modello da usare", options=["mistral", "deepseek-coder"])
-    temperatura = st.slider("Creatività del testo (temperature)", min_value=0.0, max_value=1.0, value=0.7, step=0.1)
-    max_tokens = st.slider("Numero massimo di token generati", 100, 1024, 512)
+# ========================================
+# ✍️ SECTION GENERATION FORM
+# ========================================
 
-    genera = st.form_submit_button("🧠 Genera testo")
+st.header("✏️ Generate a report paragraph")
 
+with st.form("form_generation"):
+    prompt = st.text_area("Enter your prompt", height=200, placeholder="e.g., Describe the environmental impact of the company")
+    modello = st.selectbox("Choose the LLM", options=["mistral", "deepseek-coder"])
+    temperatura = st.slider("Creativity (temperature)", min_value=0.0, max_value=1.0, value=0.7, step=0.1)
+    max_chunks = st.slider("How many document chunks to retrieve?", 1, 10, 5)
+
+    genera = st.form_submit_button("🧠 Generate section")
+
+# When user submits the form
 if genera and prompt.strip() != "":
-    st.info("Generazione in corso... ⏳")
+    st.info("Generating your section... ⏳")
     try:
-        output = generate_text_section(prompt, model=modello, temperature=temperatura, max_tokens=max_tokens)
-        st.success("Testo generato ✅")
-        st.markdown("### 📝 Risultato")
+        # Retrieval + generation (RAG pipeline)
+        output = generate_section_from_documents(
+            prompt=prompt,
+            model=modello,
+            n_results=max_chunks
+        )
+
+        st.success("✅ Section generated successfully!")
+        st.markdown("### 📝 Result")
         st.write(output)
+
     except Exception as e:
-        st.error(f"Errore nella generazione: {str(e)}")
+        st.error(f"Text generation failed: {str(e)}")

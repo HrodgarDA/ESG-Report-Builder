@@ -33,7 +33,7 @@ def store_in_chromadb(nome, estensione, testo, chunk_size=500, overlap=50):
     Output:
     - Salva i chunk indicizzati in una collezione ChromaDB
     """
-
+    print(f"📥 Indicizzazione in corso per: {nome}{estensione}")
     # 1. Creazione dello splitter per suddividere il testo
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
@@ -64,7 +64,7 @@ def store_in_chromadb(nome, estensione, testo, chunk_size=500, overlap=50):
     )
 
     print(f"✅ Indicizzati {len(chunks)} chunk del documento '{nome}{estensione}' usando embedding locali.")
-
+    
 
 # ========================================
 # 🔍 FUNZIONE DI QUERY IN CHROMADB
