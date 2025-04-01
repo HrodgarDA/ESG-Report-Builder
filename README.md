@@ -1,6 +1,5 @@
 📁 agente_esg/
 
-│
 ├── 📄 app.py                  # App Streamlit (entry point)
 
 ├── 📄 parser.py               # PDF Parsing 
@@ -9,7 +8,7 @@
 
 ├── 📄 generator_ai.py         # Prompt + text generation
 
-├── 📄 visual_utils.py         # Graphs and utilis
+├── 📄 esg_visuals.py         # Graphs and utilis
 
 ├── 📄 report_pdf.py           # Composition and PDF generation
 
