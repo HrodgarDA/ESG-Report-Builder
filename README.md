@@ -83,18 +83,11 @@ ________________________________________________________________________________
 
 Components:
 
-Python: Main development language
-
-Matplotlib / Seaborn / Pandas: For ESG charts (ready to use)
-
-Streamlit: Web interface
-
-PyMuPDF (fitz): PDF parsing
-
-LangChain: Text chunking
-
-ChromaDB: Vector database
-
-sentence-transformers: Local embeddings
-
-Ollama: Local LLM runner
+Python  - Main development language
+Streamlit - Web interface
+PyMuPDF (fitz) - PDF parsing
+LangChain - Text chunking
+ChromaDB - Vector database
+sentence-transformers - Local embeddings
+Ollama - Local LLM runner
+Matplotlib / Seaborn / Pandas - For ESG charts (ready to use)
