@@ -1,6 +1,6 @@
-# ========================================
+# ============================================
 # 📦 IMPORT LIBRARIES AND MODULES
-# ========================================
+# ============================================
 
 import streamlit as st
 import os
@@ -11,17 +11,16 @@ from vectorial_db import store_in_chromadb  # ✅ indexing of parsed chunks
 from generator_ai import generate_section_from_documents  # ✅ RAG pipeline (retrieval + generation)
 
 
-# ========================================
+# ============================================
 # ⚙️ STREAMLIT PAGE CONFIGURATION
-# ========================================
-
+# ============================================
 st.set_page_config(page_title="ESG Report AI Agent", layout="wide")
 st.title("🧠 AI Agent for Sustainability Reporting")
 
 
-# ========================================
-# 📑 SIDEBAR MENU: BRAND COLORS + RESET
-# ========================================
+# ============================================
+# 📑 SIDEBAR MENU: BRAND COLORS + RESET BUTTON
+# ============================================
 
 with st.sidebar:
     st.header("⚙️ Settings")
@@ -36,14 +35,14 @@ with st.sidebar:
     if st.button("🗑️ Reset LLM Memory / Clear ChromaDB"):
         if os.path.exists("chroma.sqlite3"):
             os.remove("chroma.sqlite3")
-            st.success("ChromaDB memory has been reset.")
+            st.success("Agent's memory has been reset.")
         else:
-            st.warning("No ChromaDB memory found to clear.")
+            st.warning("No memory found to clear.")
 
 
-# ========================================
+# ============================================
 # 📁 FILE UPLOAD SECTION (MAIN PAGE BLOCK)
-# ========================================
+# ============================================
 
 st.header("📄 Upload your ESG document(s)")
 
@@ -82,9 +81,9 @@ else:
     st.info("Please upload at least one file to proceed.")
 
 
-# ========================================
+# ============================================
 # ✍️ REPORT PARAGRAPH GENERATION FORM
-# ========================================
+# ============================================
 
 st.header("✏️ Generate a report paragraph")
 
