@@ -1,5 +1,9 @@
+streamlit
+pymupdf
 chromadb
 langchain
-openai
+sentence-transformers
+transformers
+requests
+scikit-learn
 tiktoken
-PyMuPDF
