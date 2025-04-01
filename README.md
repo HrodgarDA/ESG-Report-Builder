@@ -1,6 +1,7 @@
 📁 agente_esg/
 
 │
+
 ├── 📄 app.py                  # App Streamlit (entry point)
 
 ├── 📄 parser.py               # PDF Parsing 
