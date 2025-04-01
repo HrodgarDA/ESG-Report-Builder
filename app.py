@@ -20,18 +20,25 @@ st.title("🧠 AI Agent for Sustainability Reporting")
 
 
 # ========================================
-# 🎨 BRAND COLOR SELECTION SECTION (STREAMLIT SIDEBAR)
+# 📑 SIDEBAR MENU: BRAND COLORS + RESET
 # ========================================
 
-st.sidebar.header("🎨 Customize Chart Colors")
+with st.sidebar:
+    st.header("⚙️ Settings")
 
-# Sidebar color pickers — user selects up to 3 custom brand colors
-color_1 = st.sidebar.color_picker("Primary color", "#3B82F6")  # blue
-color_2 = st.sidebar.color_picker("Secondary color", "#10B981")  # green
-color_3 = st.sidebar.color_picker("Accent color", "#F59E0B")  # yellow
+    st.subheader("🎨 Brand Colors")
+    color_1 = st.color_picker("Primary color", "#3B82F6")  # blue
+    color_2 = st.color_picker("Secondary color", "#10B981")  # green
+    color_3 = st.color_picker("Accent color", "#F59E0B")  # yellow
+    brand_colors = [color_1, color_2, color_3]
 
-# Colors will be used in ESG chart functions
-brand_colors = [color_1, color_2, color_3]
+    st.subheader("🧹 Memory Management")
+    if st.button("🗑️ Reset LLM Memory / Clear ChromaDB"):
+        if os.path.exists("chroma.sqlite3"):
+            os.remove("chroma.sqlite3")
+            st.success("ChromaDB memory has been reset.")
+        else:
+            st.warning("No ChromaDB memory found to clear.")
 
 
 # ========================================
@@ -89,9 +96,6 @@ with st.form("form_generation"):
         placeholder="e.g., Describe the environmental impact of the company"
     )
     modello = st.selectbox("Choose the LLM", options=["mistral", "deepseek-coder"])
-    temperatura = st.slider("Creativity (temperature)", 0.0, 1.0, 0.7, step=0.1)
-    max_chunks = st.slider("How many document chunks to retrieve?", 1, 10, 5)
-
     genera = st.form_submit_button("🧠 Generate section")
 
 # If user submits the form
@@ -102,7 +106,7 @@ if genera and prompt.strip() != "":
         output = generate_section_from_documents(
             prompt=prompt,
             model=modello,
-            n_results=max_chunks
+            n_results=6  # fixed max_chunks
         )
 
         st.success("✅ Section generated successfully!")
