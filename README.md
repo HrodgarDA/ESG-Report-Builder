@@ -1,14 +1,25 @@
 📁 agente_esg/
+
 │
 ├── 📄 app.py                  # App Streamlit (entry point)
+
 ├── 📄 parser.py               # PDF Parsing 
+
 ├── 📄 chroma_db.py            # Indicization, embedding e query
+
 ├── 📄 generator_ai.py         # Prompt + text generation
+
 ├── 📄 visual_utils.py         # Graphs and utilis
+
 ├── 📄 report_pdf.py           # Composition and PDF generation
+
 ├── 📁 documents/              # Directory for updated documents
+
 ├── 📁 Requirements/           # Envoironment requirements
+
 └── 📁 output/                 # Generated report (PDF)
+
+_______________________________________________________________________________________________________________
 
 ✅ What This Project Can Do So Far:
 
@@ -68,14 +79,24 @@ Allow users (e.g., sustainability officers or analysts) to:
 	•	A sidebar button lets the user delete the ChromaDB database (chroma.sqlite3)
 	•	Useful for resetting the session or starting with a new document set
 
+____________________________________________________________________________________________________________
 
-Component - Purpose
+Components:
 
-Python  - Main development language
-Streamlit - Web interface
-PyMuPDF (fitz) - PDF parsing
-LangChain - Text chunking
-ChromaDB - Vector database
-sentence-transformers - Local embeddings
-Ollama - Local LLM runner
-Matplotlib / Seaborn / Pandas - For ESG charts (ready to use)
+Python: Main development language
+
+Matplotlib / Seaborn / Pandas: For ESG charts (ready to use)
+
+Streamlit: Web interface
+
+PyMuPDF (fitz): PDF parsing
+
+LangChain: Text chunking
+
+ChromaDB: Vector database
+
+sentence-transformers: Local embeddings
+
+Ollama: Local LLM runner
+
+
