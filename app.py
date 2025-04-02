@@ -19,7 +19,7 @@ st.title("🧠 AI Agent for Sustainability Reporting")
 
 
 # ============================================
-# 📑 SIDEBAR MENU: BRAND COLORS + RESET BUTTON
+# 📑 SIDEBAR MENU: BRAND COLORS + RESET BUTTONS
 # ============================================
 
 with st.sidebar:
@@ -32,12 +32,34 @@ with st.sidebar:
     brand_colors = [color_1, color_2, color_3]
 
     st.subheader("🧹 Memory Management")
-    if st.button("🗑️ Reset LLM Memory / Clear ChromaDB"):
-        if os.path.exists("chroma.sqlite3"):
-            os.remove("chroma.sqlite3")
-            st.success("Agent's memory has been reset.")
+
+    # --- Reset ChromaDB ---
+    confirm_reset_chroma = st.checkbox("I confirm I want to delete the ChromaDB database")
+
+    if st.button("🧠 Reset Agent memory (ChromaDB)"):
+        if confirm_reset_chroma:
+            if os.path.exists("chroma.sqlite3"):
+                os.remove("chroma.sqlite3")
+                st.success("✅ Agent memory has been successfully deleted.")
+            else:
+                st.warning("⚠️ no memory found.")
         else:
-            st.warning("No memory found to clear.")
+            st.warning("Please confirm the action by checking the box above.")
+
+    # --- Delete uploaded documents ---
+    confirm_delete_documents = st.checkbox("I confirm I want to delete all uploaded documents")
+
+    if st.button("📁 Delete uploaded documents"):
+        if confirm_delete_documents:
+            if os.path.exists("Documents"):
+                shutil.rmtree("Documents")
+                st.success("✅ The Documents folder has been successfully deleted.")
+                # Optional: recreate the folder immediately
+                os.makedirs("Documents", exist_ok=True)
+            else:
+                st.warning("⚠️ Documents folder not found.")
+        else:
+            st.warning("Please confirm the action by checking the box above.")
 
 
 # ============================================

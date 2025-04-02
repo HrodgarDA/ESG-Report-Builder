@@ -1,5 +1,5 @@
 # ========================================
-# 📦 IMPORT DELLE LIBRERIE
+# 📦 LIBRARY IMPORTS
 # ========================================
 
 import chromadb
@@ -8,54 +8,66 @@ from sentence_transformers import SentenceTransformer
 
 
 # ========================================
-# ⚙️ INIZIALIZZAZIONE DEL MODELLO DI EMBEDDING
+# ⚙️ INITIALIZE EMBEDDING MODEL
 # ========================================
 
-# Carichiamo il modello di embedding locale (gratuito, compatibile con CPU)
+# Loads a local, CPU-compatible embedding model
 embedder = SentenceTransformer("all-MiniLM-L6-v2")
 
 
 # ========================================
-# 📥 FUNZIONE DI INDICIZZAZIONE IN CHROMADB
+# 📥 STORE DOCUMENT CHUNKS INTO CHROMADB
 # ========================================
 
 def store_in_chromadb(nome, estensione, testo, chunk_size=500, overlap=50):
     """
-    Divide il testo in chunk, genera embedding locali e li salva in ChromaDB.
+    Splits the text into chunks, generates local embeddings, and stores them in ChromaDB.
 
-    Parametri:
-    - nome (str): nome del file sorgente
-    - estensione (str): formato file (.pdf, .txt, ecc.)
-    - testo (str): testo completo del documento
-    - chunk_size (int): numero massimo di caratteri per chunk
-    - overlap (int): sovrapposizione tra chunk consecutivi
+    Parameters:
+    - nome (str): source file name (no extension)
+    - estensione (str): file extension (.pdf, .txt, etc.)
+    - testo (str): full text extracted from document
+    - chunk_size (int): max characters per chunk
+    - overlap (int): character overlap between chunks
 
     Output:
-    - Salva i chunk indicizzati in una collezione ChromaDB
+    - Indexed chunks saved into ChromaDB collection
     """
-    print(f"📥 Indicizzazione in corso per: {nome}{estensione}")
-    # 1. Creazione dello splitter per suddividere il testo
+
+    print(f"📥 Indexing started for: {nome}{estensione}")
+
+    # 1. Text splitting configuration
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=overlap,
-        separators=["\n\n", "\n", ".", " "]  # priorità di separazione
+        separators=["\n\n", "\n", ".", " "]  # priority of split: paragraph > line > sentence > word
     )
 
-    # 2. Suddivisione in chunk
+    # 2. Split text into chunks
     chunks = splitter.split_text(testo)
 
-    # 3. Calcolo degli embedding locali
+    # ❗ Skip empty documents or failed parsing
+    if not chunks:
+        print(f"⚠️ Skipped {nome}{estensione}: no content extracted.")
+        return
+
+    # 3. Generate embeddings for each chunk
     embeddings = embedder.encode(chunks).tolist()
 
-    # 4. Inizializzazione del database vettoriale ChromaDB
+    # ❗ Safety check to avoid crash with empty embeddings
+    if not embeddings:
+        print(f"⚠️ Skipped {nome}{estensione}: empty embeddings list.")
+        return
+
+    # 4. Initialize ChromaDB client and collection
     client = chromadb.PersistentClient(path="./chroma_db")
     collection = client.get_or_create_collection(name="report_sostenibilita")
 
-    # 5. Creazione degli ID e metadati per ogni chunk
+    # 5. Generate unique IDs and metadata
     ids = [f"{nome}_{i}" for i in range(len(chunks))]
     metadatas = [{"origine": nome, "estensione": estensione, "chunk": i} for i in range(len(chunks))]
 
-    # 6. Aggiunta alla collezione
+    # 6. Add records to the collection
     collection.add(
         ids=ids,
         documents=chunks,
@@ -63,38 +75,37 @@ def store_in_chromadb(nome, estensione, testo, chunk_size=500, overlap=50):
         metadatas=metadatas
     )
 
-    print(f"✅ Indicizzati {len(chunks)} chunk del documento '{nome}{estensione}' usando embedding locali.")
-    
+    print(f"✅ Indexed {len(chunks)} chunks from '{nome}{estensione}' using local embeddings.")
+
 
 # ========================================
-# 🔍 FUNZIONE DI QUERY IN CHROMADB
+# 🔍 QUERY CHROMADB FOR RELEVANT CHUNKS
 # ========================================
 
 def query_chromadb(prompt, n_results=5):
     """
-    Cerca i chunk più rilevanti in ChromaDB rispetto a un prompt.
+    Searches for the most relevant document chunks in ChromaDB based on a user prompt.
 
-    Parametri:
-    - prompt (str): domanda o tema da cercare
-    - n_results (int): numero di risultati da restituire
+    Parameters:
+    - prompt (str): user input prompt/question
+    - n_results (int): number of top matching chunks to retrieve
 
-    Ritorna:
-    - List[str]: lista dei chunk di testo più rilevanti
+    Returns:
+    - List[str]: list of retrieved text chunks
     """
 
-    # 1. Calcolo dell'embedding del prompt
+    # 1. Generate embedding for the user prompt
     query_embedding = embedder.encode([prompt]).tolist()[0]
 
-    # 2. Inizializzazione del client e recupero collezione
+    # 2. Connect to ChromaDB and access the collection
     client = chromadb.PersistentClient(path="./chroma_db")
     collection = client.get_or_create_collection(name="report_sostenibilita")
 
-    # 3. Ricerca dei documenti più simili semanticamente
+    # 3. Perform vector search
     results = collection.query(
         query_embeddings=[query_embedding],
         n_results=n_results
     )
 
-    # 4. Estrazione dei documenti rilevanti
-    documenti = results["documents"][0]  # lista di stringhe
-    return documenti
+    # 4. Return retrieved text chunks
+    return results.get("documents", [[]])[0]
