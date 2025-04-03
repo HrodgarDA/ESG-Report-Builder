@@ -82,7 +82,7 @@ def store_in_chromadb(nome, estensione, testo, chunk_size=500, overlap=50):
 # 🔍 QUERY CHROMADB FOR RELEVANT CHUNKS
 # ========================================
 
-def query_chromadb(prompt, n_results=5):
+def query_chromadb(prompt, n_results=20):
     """
     Searches for the most relevant document chunks in ChromaDB based on a user prompt.
 

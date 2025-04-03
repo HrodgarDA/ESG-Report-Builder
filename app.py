@@ -36,13 +36,15 @@ with st.sidebar:
     # --- Reset ChromaDB ---
     confirm_reset_chroma = st.checkbox("I confirm I want to delete the ChromaDB database")
 
+    CHROMA_DB_PATH = "chroma/chroma.sqlite3"
+
     if st.button("🧠 Reset Agent memory (ChromaDB)"):
         if confirm_reset_chroma:
-            if os.path.exists("chroma.sqlite3"):
-                os.remove("chroma.sqlite3")
+            if os.path.exists(CHROMA_DB_PATH):
+                os.remove(CHROMA_DB_PATH)
                 st.success("✅ Agent memory has been successfully deleted.")
             else:
-                st.warning("⚠️ no memory found.")
+                st.warning("⚠️ No memory found.")
         else:
             st.warning("Please confirm the action by checking the box above.")
 
