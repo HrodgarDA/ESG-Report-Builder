@@ -7,3 +7,7 @@ transformers
 requests
 scikit-learn
 tiktoken
+matplotlib
+seaborn
+pandas
+numpy
