@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from langchain.output_parsers import PydanticOutputParser
 from langchain.prompts import ChatPromptTemplate
 from langchain.agents import create_tool_calling_agent, AgentExecutor
-from langchain_community.llms import Ollama
+from langchain_community.llms import ollama
 
 # Import available tools for chart and table generation
 from tools import plot_bar_chart, plot_line_chart, plot_pie_chart, plot_table
@@ -58,11 +58,8 @@ prompt = ChatPromptTemplate.from_messages(
 # ⚙️ STEP 4: Initialize the Local Ollama Model
 # ============================================
 
-# You must have Ollama running locally and the model (e.g. "mistral") already pulled:
-# > ollama run mistral
-
 try:
-    llm = Ollama(model="mistral", temperature=0.3, max_tokens=2048)
+    llm = ollama(model="mistral", temperature=0.3, max_tokens=2048)
 except Exception as e:
     raise RuntimeError("❌ Could not initialize the Ollama model. Make sure Ollama is running and the model is available.") from e
 
