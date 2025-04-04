@@ -8,6 +8,7 @@ import pandas as pd
 import seaborn as sns
 from io import BytesIO
 import base64
+from langchain.tools import Tool
 
 # ========================================
 # 🎨 UTILITÀ: Funzione per applicare colori brand
@@ -35,6 +36,11 @@ def generate_bar_chart(data, x_col, y_col, title, colors):
 
     return fig_to_base64(plt)
 
+plot_bar_chart = Tool(
+    name="plot_bar_chart",
+    func=generate_bar_chart,
+    description="Genera un grafico a barre che mostri l'andamento delle metriche o KPIs per il report ESG."
+)
 
 # ========================================
 # 📈 LINE CHART ESG
@@ -53,6 +59,11 @@ def generate_line_chart(data, x_col, y_col, title, colors):
 
     return fig_to_base64(plt)
 
+plot_line_chart = Tool(
+    name="plot_line_chart",
+    func=generate_line_chart,
+    description="Genera un grafico a linee che mostri l'andamento delle metriche o KPIs per il report ESG."
+)
 
 # ========================================
 # 🥧 PIE CHART ESG
@@ -66,6 +77,11 @@ def generate_pie_chart(labels, values, title, colors):
 
     return fig_to_base64(plt)
 
+plot_pie_chart = Tool(
+    name="plot_line_chart",
+    func=generate_line_chart,
+    description="Genera un grafico a torta che mostri le metriche o KPIs per il report ESG."
+)
 
 # ========================================
 # 📋 TABELLA ESG
@@ -78,6 +94,11 @@ def generate_table(data, title):
     table_html = f"<h4>{title}</h4>" + data.to_html(classes='esg-table', index=False)
     return table_html
 
+plot_table = Tool(
+    name="plot_table",
+    func=generate_table,
+    description="Genera una tabella che mostri le metriche o KPIs per il report ESG."
+)
 
 # ========================================
 # 💾 CONVERSIONE GRAFICO IN BASE64 PER STREAMLIT
